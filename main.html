@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turlifoss</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: "Roboto", "Arial Rounded MT Bold", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; 
+            position: relative; /* Set position relative for proper z-index stacking */
+        }
+
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+        
+
+        #header {
+            position: fixed;
+            top: 1vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            align-self: center;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: rgb(33, 33, 33);
+            line-height: 40px;
+            min-width: min-content;
+  
+
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Add some text shadow */
+            font-size: 20px;
+            font-family: "Montserrat", sans-serif;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001; /* Lower z-index to be below the map */
+        }
+        
+        .button {
+            cursor: pointer;
+        }
+
+        .buttons {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        .search {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            font-size: 20px;
+            font-family: "Montserrat", sans-serif;
+            color: #000;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+            background-color: #f2f2f200; 
+            border: none; 
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            box-sizing: border-box; /* Add this line */
+            transition: 0.3s ease-in-out;
+        }
+
+        .search:focus {
+            background-color: #f2f2f200;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+            outline: none;
+        }
+
+        #search_bar::placeholder {
+            color: #333333;
+            font-family: "Montserrat", sans-serif;
+            transition: transform 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+        #search_bar:hover::placeholder {
+            font-size: 22px;
+        }
+
+        #loginForm {
+            display: none;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 40px;
+            box-sizing: border-box;
+            z-index: 1004;
+            font-family: "Montserrat", sans-serif;
+        }
+
+        #closeButton {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="header">
+        <div class="buttons">
+            <div class="button" id="login" onclick="toggleLogin()">Login</div>
+            <input type="text" class="search" id="search_bar" placeholder="Search city" onkeypress="checkEnter(event)">
+            <div class="button" id="register" onclick="toggleRegister()">Register</div>
+        </div>
+    </div>
+
+    <div id="loginForm">
+        <div id="closeButton" onclick="closeLogin()">x</div>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <a href="#">Forgot password?</a>
+        <button type="submit" onclick="handleLogin()">Login</button>
+    </div>
+        
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Custom JavaScript -->
+    <script>
+
+        function toggleRegister() {
+            window.location.href = 'register.html';
+        }
+
+        function toggleLogin() {
+            var loginForm = document.getElementById('loginForm');
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        // Function to handle login
+        function handleLogin() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            // Perform login operation here
+            // This could be an AJAX call to your server, a fetch request, etc.
+            // For now, we'll just log the username and password to the console
+            console.log('Username:', username);
+            console.log('Password:', password);
+        }
+        
+        function closeLogin() {
+            document.getElementById('loginForm').style.display = 'none';
+        }
+
+        // Initialize map
+        var southWest = L.latLng(-80, -Infinity),
+            northEast = L.latLng(85, Infinity),
+            bounds = L.latLngBounds(southWest, northEast);
+
+        var map = L.map('map', {
+            zoomControl: false,
+            maxBounds: bounds,
+            maxBoundsViscosity: 1.0
+        }).setView([0, 0], 2);
+
+        // Add Tile layer from OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            minZoom: 3,
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // GeoJSON data for countries' boundaries
+        var countriesLayer;
+
+        // Function to handle country click event
+        function onCountryClick(e) {
+            // Reset style for all countries
+            countriesLayer.resetStyle();
+
+            // Change color of clicked country to green
+            e.target.setStyle({
+                fillColor: 'green',
+                fillOpacity: 0.5
+            });
+        }
+
+        // Fetch GeoJSON data and add it to the map
+        fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+            .then(response => response.json())
+            .then(data => {
+                countriesLayer = L.geoJSON(data, {
+                    style: {
+                        color: 'transparent',  // No border
+                        fillColor: 'transparent'  // No fill
+                    },
+                    onEachFeature: function(feature, layer) {
+                        // Add click event listener to each country
+                        layer.on({
+                            click: onCountryClick
+                        });
+                    }
+                }).addTo(map);
+            })
+            .catch(error => console.error('Error:', error));
+
+            function checkEnter(event) {
+                // If the key pressed was Enter, search for the city
+                if (event.key === 'Enter') {
+                    searchCity();
+                }
+            }
+
+        // Custom places
+        var customPlaces = {
+        'Krupis': { lat: 35.505, lon: -0.09 }
+        };
+
+        function searchCity() {
+            var cityName = document.getElementById('search_bar').value;
+
+            // Check if the city name matches any of your custom places
+            if (customPlaces[cityName]) {
+                var lat = customPlaces[cityName].lat;
+                var lon = customPlaces[cityName].lon;
+                map.flyTo([lat, lon], 13);
+            } else {
+                // If the city name does not match any of your custom places, use the OpenStreetMap Nominatim API to search for the city
+                fetch('https://nominatim.openstreetmap.org/search?city=' + cityName + '&format=json')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            var lat = data[0].lat;
+                            var lon = data[0].lon;
+                            map.flyTo([lat, lon], 13);
+                        } else {
+                            alert('Error, no city found!');
+                        }
+                    });
+            }
+        }
+    </script>
+</body>
+</html>
