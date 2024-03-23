@@ -40,7 +40,7 @@
             -webkit-backdrop-filter: blur(8px);
             color: rgb(33, 33, 33);
             line-height: 40px;
-            min-width: min-content;
+            min-width: max-content;
   
 
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Add some text shadow */
@@ -55,6 +55,8 @@
         
         .button {
             cursor: pointer;
+            padding-left: 30px;
+            padding-right: 30px;
         }
 
         .buttons {
@@ -62,8 +64,6 @@
             display: flex;
             justify-content: space-between;
             width: 100%;
-            padding-left: 30px;
-            padding-right: 30px;
         }
 
         .search {
@@ -77,9 +77,10 @@
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            box-sizing: border-box; /* Add this line */
+            box-sizing: border-box; 
             transition: 0.3s ease-in-out;
-            min-width: 80%;
+            width: 100%;
+            max-width: 600px; 
         }
 
         .search:focus {
@@ -124,6 +125,33 @@
             cursor: pointer;
         }
 
+        .searchButton {
+            display: none;
+            cursor: pointer;
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        #search_bar:focus ~ .searchButton {
+            display: block;
+        }
+
+        #searchButton:focus ~ .searchButton {
+            display: block;
+        }
+
+        #searchButton:focus ~ #register {
+            display: none;
+        }
+
+        #register {
+            display: block;
+        }
+
+        #search_bar:focus ~ #register {
+            display: none;
+        }
+
     </style>
 </head>
 <body>
@@ -133,6 +161,7 @@
             <div class="button" id="login" onclick="toggleLogin()">Login</div>
             <input type="text" class="search" id="search_bar" placeholder="Search city" onkeypress="checkEnter(event)">
             <div class="button" id="register" onclick="toggleRegister()">Register</div>
+            <div class="searchButton" onclick="searchCity()">Search</div>
         </div>
     </div>
 
@@ -144,9 +173,7 @@
         <button type="submit" onclick="handleLogin()">Login</button>
     </div>
         
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- Custom JavaScript -->
     <script>
 
         function toggleRegister() {
@@ -158,14 +185,36 @@
             document.getElementById('loginForm').style.display = 'block';
         }
 
+        document.addEventListener('DOMContentLoaded', function() {
+            var searchBar = document.querySelector('#search_bar');
+            var registerButton = document.querySelector('#register');
+            var searchButton = document.querySelector('.searchButton');
+
+            searchBar.addEventListener('focus', function() {
+                registerButton.style.display = 'none';
+                searchButton.style.display = 'block';
+            });
+
+            searchBar.addEventListener('blur', function() {
+                // Add a delay before hiding the button
+                setTimeout(function() {
+                    registerButton.style.display = 'block';
+                    searchButton.style.display = 'none';
+                }, 300); // Delay in milliseconds
+            });
+
+            searchButton.addEventListener('click', function() {
+                // Perform search action
+                // This is just a placeholder. Replace this with your actual search logic.
+                console.log('Search:', searchBar.value);
+            });
+        });
+
         // Function to handle login
         function handleLogin() {
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
 
-            // Perform login operation here
-            // This could be an AJAX call to your server, a fetch request, etc.
-            // For now, we'll just log the username and password to the console
             console.log('Username:', username);
             console.log('Password:', password);
         }
@@ -195,17 +244,15 @@
         // GeoJSON data for countries' boundaries
         var countriesLayer;
 
-        // Function to handle country click event
         function onCountryClick(e) {
-            // Reset style for all countries
             countriesLayer.resetStyle();
 
-            // Change color of clicked country to green
             e.target.setStyle({
                 fillColor: 'green',
-                fillOpacity: 0.5
+                fillOpacity: 0.0
             });
         }
+
 
         // Fetch GeoJSON data and add it to the map
         fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
@@ -227,11 +274,27 @@
             .catch(error => console.error('Error:', error));
 
             function checkEnter(event) {
-                // If the key pressed was Enter, search for the city
                 if (event.key === 'Enter') {
                     searchCity();
                 }
             }
+
+            var searchButton = document.querySelector('.searchButton');
+            searchButton.addEventListener('click', function() {
+                searchCity();
+            });
+
+// Custom places
+var customPlaces = {
+    'Krupis': { lat: 35.505, lon: -0.09 }
+};
+
+function searchCity() {
+    var cityName = document.getElementById('search_bar').value;
+
+    // Check if the city name matches any of your custom places
+    // ...
+}
 
         // Custom places
         var customPlaces = {
