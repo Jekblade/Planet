@@ -35,14 +35,12 @@
             padding: 10px 20px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 16px;
-
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             color: rgb(33, 33, 33);
-            line-height: 40px;
+
             min-width: max-content;
-  
 
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Add some text shadow */
             font-size: 20px;
@@ -67,6 +65,7 @@
             width: 100%;
         }
 
+
         .search {
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
             font-size: 20px;
@@ -75,13 +74,14 @@
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
             background-color: #f2f2f200; 
             border: none; 
-            padding: 20px;
+            padding-top: 10px;
+            padding-bottom: 10px;
             border-radius: 10px;
             text-align: center;
-            box-sizing: border-box; 
             transition: 0.3s ease-in-out;
             width: 100%;
             max-width: 500px; 
+            height: auto;
         }
 
         .search:focus {
@@ -155,6 +155,26 @@
             cursor: pointer;
             padding-left: 30px;
             padding-right: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: #333333;
+            padding: 10px;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+            transform: translateZ(0);
+            perspective: 1000px;
+        }
+
+        .searchButton:hover {
+            background: rgba(43, 43, 43, 0.2);
+            transform: translateZ(50px);
+        }
+
+        .searchButton:active {
+            transform: translateZ(0);
         }
 
         #search_bar:focus ~ .searchButton {
@@ -169,8 +189,36 @@
             display: none;
         }
 
+        .register-container {
+            padding-left: 20px;
+        }
+
         #register {
             display: block;
+            background: linear-gradient(90deg, rgba(255,177,206,0.7), rgba(178,255,219,0.7), rgba(178,223,255,0.7), rgba(255,178,178,0.7));
+            background-size: 200% 200%;
+            animation: gradient 5s ease infinite;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #333333;
+            padding: 10px;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+
+        @keyframes gradient {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        #register:hover {
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.7);
+            transform: scale(1.05);
         }
 
         #search_bar:focus ~ #register {
@@ -192,8 +240,6 @@
             #header {
                 width: 80%;
                 font-size: 15px;
-                max-width: none;
-                min-width: none;
             }
 
             #search_bar:hover::placeholder {
@@ -207,9 +253,13 @@
     <div id="map"></div>
     <div id="header">
         <div class="buttons">
-            <div class="button" id="login" onclick="toggleLogin()">   Login</div>
-            <input type="text" class="search" id="search_bar" placeholder="Search city" onkeypress="checkEnter(event)">
-            <div class="button" id="register" onclick="">Register</div>
+            <div class="button" id="login" onclick="toggleLogin()">Login</div>
+            <div class="search-container">
+                <input type="text" class="search" id="search_bar" placeholder="Search city" onkeypress="checkEnter(event)">
+            </div>
+            <div class="register-container">
+                <div class="button" id="register" onclick="">Register</div>
+            </div>
             <div class="searchButton">Search</div>
         </div>
     </div>
@@ -298,7 +348,7 @@
 
             e.target.setStyle({
                 fillColor: 'green',
-                fillOpacity: 0.0
+                fillOpacity: 0.5
             });
         }
 
