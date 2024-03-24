@@ -119,6 +119,24 @@
             font-family: "Montserrat", sans-serif;
         }
 
+        #addPlaceForm {
+            display: none;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 40px;
+            box-sizing: border-box;
+            z-index: 1004;
+            font-family: "Montserrat", sans-serif;
+        }
+
         #username, #password {
             font-family: "Montserrat", sans-serif;
             text-align: center;
@@ -150,6 +168,15 @@
             cursor: pointer;
         }
 
+        #country {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        #score {
+            font-size: 16px;
+        }
+
         .searchButton {
             display: none;
             cursor: pointer;
@@ -171,22 +198,6 @@
         .searchButton:hover {
             background: rgba(43, 43, 43, 0.2);
             transform: translateZ(50px);
-        }
-
-        .searchButton:active {
-            transform: translateZ(0);
-        }
-
-        #search_bar:focus ~ .searchButton {
-            display: block;
-        }
-
-        #searchButton:focus ~ .searchButton {
-            display: block;
-        }
-
-        #searchButton:focus ~ #register {
-            display: none;
         }
 
         .register-container {
@@ -254,6 +265,7 @@
     <div id="header">
         <div class="buttons">
             <div class="button" id="login" onclick="toggleLogin()">Login</div>
+            <div class="button" id="addPlace" onclick="toggleAddPlace()">Add place</div>
             <div class="search-container">
                 <input type="text" class="search" id="search_bar" placeholder="Search city" onkeypress="checkEnter(event)">
             </div>
@@ -270,6 +282,12 @@
         <input type="password" id="password" placeholder="Password">
         <a href="#">Forgot password?</a>
         <button type="submit" onclick="handleLogin()">Login</button>
+    </div>
+
+    <div id="addPlaceForm">
+        <div id="closeButton" onclick="closeAddPlace()">x</div>
+        <input type="text" id="placeName" placeholder="Place Name">
+        <button type="submit" onclick="handleAddPlace()">Add</button>
     </div>
         
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -301,12 +319,6 @@
                     searchButton.style.display = 'none';
                 }, 300); // Delay in milliseconds
             });
-
-            searchButton.addEventListener('click', function() {
-                // Perform search action
-                // This is just a placeholder. Replace this with your actual search logic.
-                console.log('Search:', searchBar.value);
-            });
         });
 
         // Function to handle login
@@ -323,7 +335,7 @@
         }
 
         // Initialize map
-        var southWest = L.latLng(-80, -Infinity),
+        var southWest = L.latLng(-85, -Infinity),
             northEast = L.latLng(85, Infinity),
             bounds = L.latLngBounds(southWest, northEast);
 
@@ -333,72 +345,67 @@
             maxBoundsViscosity: 1.0
         }).setView([0, 0], 2);
 
-        // Add Tile layer from OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            minZoom: 3,
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        L.tileLayer('https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=9Hhc2MEBF7E6XrZ4w8ob', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://www.maptiler.com/">Maptiler</a>',
+            maxZoom: 18,
+            minZoom: 2,
         }).addTo(map);
 
-        // GeoJSON data for countries' boundaries
-        var countriesLayer;
-
-        function onCountryClick(e) {
-            countriesLayer.resetStyle();
-
-            e.target.setStyle({
-                fillColor: 'green',
-                fillOpacity: 0.5
-            });
+        // Search for a city
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                searchCity();
+            }
         }
 
+        var searchButton = document.querySelector('.searchButton');
+        searchButton.addEventListener('click', function() {
+            searchCity();
+        });
 
-        // Fetch GeoJSON data and add it to the map
-        fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
-            .then(response => response.json())
-            .then(data => {
-                countriesLayer = L.geoJSON(data, {
-                    style: {
-                        color: 'transparent',  // No border
-                        fillColor: 'transparent'  // No fill
-                    },
-                    onEachFeature: function(feature, layer) {
-                        // Add click event listener to each country
-                        layer.on({
-                            click: onCountryClick
-                        });
-                    }
-                }).addTo(map);
-            })
-            .catch(error => console.error('Error:', error));
 
-            function checkEnter(event) {
-                if (event.key === 'Enter') {
-                    searchCity();
-                }
+        //Adding a place
+        var addingPlace = false;
+        var newPlaceCoordinates = null;
+
+        function toggleAddPlace() {
+            addingPlace = true;
+            document.getElementById('addPlaceForm').style.display = 'block';
+        }
+
+        function closeAddPlace() {
+            addingPlace = false;
+            document.getElementById('addPlaceForm').style.display = 'none';
+        }
+
+        function handleAddPlace() {
+            var placeName = document.getElementById('placeName').value;
+            customPlaces[placeName] = { lat: newPlaceCoordinates.lat, lon: newPlaceCoordinates.lng };
+            closeAddPlace();
+        }
+
+        map.on('click', function(e) {
+            if (addingPlace) {
+                newPlaceCoordinates = e.latlng;
             }
-
-            var searchButton = document.querySelector('.searchButton');
-            searchButton.addEventListener('click', function() {
-                searchCity();
-            });
-
-// Custom places
-var customPlaces = {
-    'Krupis': { lat: 35.505, lon: -0.09 }
-};
-
-function searchCity() {
-    var cityName = document.getElementById('search_bar').value;
-
-    // Check if the city name matches any of your custom places
-    // ...
-}
+        });
 
         // Custom places
         var customPlaces = {
-        'Krupis': { lat: 35.505, lon: -0.09 }
+            'Krupis': { lat: 35.505, lon: -0.09 }
         };
+
+        // Add a circle for each custom place
+        for (var place in customPlaces) {
+            var lat = customPlaces[place].lat;
+            var lon = customPlaces[place].lon;
+            var circle = L.circle([lat, lon], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 5000
+            }).addTo(map);
+        }
 
         function searchCity() {
             var cityName = document.getElementById('search_bar').value;
@@ -409,7 +416,6 @@ function searchCity() {
                 var lon = customPlaces[cityName].lon;
                 map.flyTo([lat, lon], 13);
             } else {
-                // If the city name does not match any of your custom places, use the OpenStreetMap Nominatim API to search for the city
                 fetch('https://nominatim.openstreetmap.org/search?city=' + cityName + '&format=json')
                     .then(response => response.json())
                     .then(data => {
@@ -423,6 +429,7 @@ function searchCity() {
                     });
             }
         }
+
     </script>
 </body>
 </html>
