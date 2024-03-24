@@ -16,7 +16,7 @@
             margin: 0;
             padding: 0;
             font-family: "Roboto", "Arial Rounded MT Bold", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; 
-            position: relative; /* Set position relative for proper z-index stacking */
+            position: relative;
         }
 
         #map {
@@ -42,14 +42,14 @@
 
             min-width: max-content;
 
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Add some text shadow */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
             font-size: 20px;
             font-family: "Montserrat", sans-serif;
 
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1001; /* Lower z-index to be below the map */
+            z-index: 1001; 
         }
         
         .button {
@@ -151,7 +151,7 @@
         }
 
         #forgotPassword {
-            font-size: 12px; /* Adjust this value as needed */
+            font-size: 8px;
         }
 
         #loginButton {
@@ -180,8 +180,6 @@
         .searchButton {
             display: none;
             cursor: pointer;
-            padding-left: 30px;
-            padding-right: 30px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 16px;
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
@@ -265,12 +263,11 @@
     <div id="header">
         <div class="buttons">
             <div class="button" id="login" onclick="toggleLogin()">Login</div>
-            <div class="button" id="addPlace" onclick="toggleAddPlace()">Add place</div>
             <div class="search-container">
-                <input type="text" class="search" id="search_bar" placeholder="Search city" onkeypress="checkEnter(event)">
+                <input type="text" class="search" id="search_bar" placeholder="Search" onkeypress="checkEnter(event)">
             </div>
             <div class="register-container">
-                <div class="button" id="register" onclick="">Register</div>
+                <div class="button" id="register" onclick="toggleRegister()">Register</div>
             </div>
             <div class="searchButton">Search</div>
         </div>
@@ -354,13 +351,13 @@
         // Search for a city
         function checkEnter(event) {
             if (event.key === 'Enter') {
-                searchCity();
+                searchPlace();
             }
         }
 
         var searchButton = document.querySelector('.searchButton');
         searchButton.addEventListener('click', function() {
-            searchCity();
+            searchPlace();
         });
 
 
@@ -380,7 +377,14 @@
 
         function handleAddPlace() {
             var placeName = document.getElementById('placeName').value;
-            customPlaces[placeName] = { lat: newPlaceCoordinates.lat, lon: newPlaceCoordinates.lng };
+            var place = { name: placeName, lat: newPlaceCoordinates.lat, lon: newPlaceCoordinates.lng };
+            fetch('http://localhost:3000/addPlace', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(place)
+            });
             closeAddPlace();
         }
 
@@ -390,12 +394,7 @@
             }
         });
 
-        // Custom places
-        var customPlaces = {
-            'Krupis': { lat: 35.505, lon: -0.09 }
-        };
-
-        // Add a circle for each custom place
+        // Display users georeferenced places
         for (var place in customPlaces) {
             var lat = customPlaces[place].lat;
             var lon = customPlaces[place].lon;
@@ -407,27 +406,32 @@
             }).addTo(map);
         }
 
-        function searchCity() {
+        function searchPlace() {
             var cityName = document.getElementById('search_bar').value;
 
-            // Check if the city name matches any of your custom places
-            if (customPlaces[cityName]) {
-                var lat = customPlaces[cityName].lat;
-                var lon = customPlaces[cityName].lon;
-                map.flyTo([lat, lon], 13);
-            } else {
-                fetch('https://nominatim.openstreetmap.org/search?city=' + cityName + '&format=json')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.length > 0) {
-                            var lat = data[0].lat;
-                            var lon = data[0].lon;
-                            map.flyTo([lat, lon], 13);
-                        } else {
-                            alert('Error, no city found!');
-                        }
-                    });
-            }
+            // First, try to find a player
+            fetch('http://localhost:3000/players?username=' + cityName)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        // If a player is found, fly to their coordinates
+                        var lat = data[0].lat;
+                        var lon = data[0].lon;
+                        map.flyTo([lat, lon], 13);
+                    } else {
+                        fetch('https://nominatim.openstreetmap.org/search?city=' + cityName + '&format=json')
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.length > 0) {
+                                    var lat = data[0].lat;
+                                    var lon = data[0].lon;
+                                    map.flyTo([lat, lon], 13);
+                                } else {
+                                    alert('Error, no city found!');
+                                }
+                            });
+                    }
+                });
         }
 
     </script>
