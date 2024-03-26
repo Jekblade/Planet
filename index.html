@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Turlifoss</title>
+    <title>GeoSocial</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
@@ -15,8 +15,17 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            font-family: "Roboto", "Arial Rounded MT Bold", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: "Montserrat", "Roboto", "Arial Rounded MT Bold", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; 
             position: relative;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            -ms-overflow-style: none; 
+            scrollbar-width: none; 
         }
 
         #map {
@@ -30,57 +39,45 @@
             top: 1vh;
             left: 50%;
             transform: translateX(-50%);
-            width: 50%;
-            align-self: center;
-            padding: 10px 20px;
+            width: 60vw;
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            border-radius: 1vw;
+            padding: 1vh;
+            box-shadow: 0 0.4vw 3vw rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(0.8vw);
+            -webkit-backdrop-filter: blur(0.8vw);
             color: rgb(33, 33, 33);
-
-            min-width: max-content;
-
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-            font-size: 20px;
-            font-family: "Montserrat", sans-serif;
-
+            font-size: 1.5vw;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1001; 
         }
-        
+
         .button {
             cursor: pointer;
-            padding-left: 30px;
-            padding-right: 30px;
+            padding-left: 2vw;
+            padding-right: 2vw;
         }
 
         .buttons {
             align-items: center;
             display: flex;
             justify-content: space-between;
-            width: 100%;
+            width: 80%;
         }
 
-
         .search {
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-            font-size: 20px;
-            font-family: "Montserrat", sans-serif;
+            font-size: 1.5vw;
             color: #000;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
             background-color: #f2f2f200; 
             border: none; 
-            padding-top: 10px;
-            padding-bottom: 10px;
-            border-radius: 10px;
+            padding: 1vh 2vw;
+            border-radius: 2vw;
             text-align: center;
             transition: 0.3s ease-in-out;
-            width: 100%;
-            max-width: 500px; 
+            max-width: 500px;
             height: auto;
         }
 
@@ -94,88 +91,12 @@
             color: #333333;
             font-family: "Montserrat", sans-serif;
             transition: transform 0.3s ease-in-out;
-            cursor: pointer;
         }
 
         #search_bar:hover::placeholder {
-            font-size: 22px;
+            font-size: 1.6vw;
         }
 
-        #loginForm {
-            display: none;
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 40px;
-            box-sizing: border-box;
-            z-index: 1004;
-            font-family: "Montserrat", sans-serif;
-        }
-
-        #addPlaceForm {
-            display: none;
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 16px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 40px;
-            box-sizing: border-box;
-            z-index: 1004;
-            font-family: "Montserrat", sans-serif;
-        }
-
-        #username, #password {
-            font-family: "Montserrat", sans-serif;
-            text-align: center;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-            background-color: #f2f2f200; 
-            border: none; 
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-            font-size: 16px;
-            font-family: "Montserrat", sans-serif;
-            color: #000;
-            border-radius: 10px;
-        }
-
-        #forgotPassword {
-            font-size: 8px;
-        }
-
-        #loginButton {
-            margin-top: auto;
-            align-self: center;
-            padding-top: 30px;
-        }
-
-
-        #closeButton {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            cursor: pointer;
-        }
-
-        #country {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-
-        #score {
-            font-size: 16px;
-        }
 
         .searchButton {
             display: none;
@@ -186,7 +107,10 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             color: #333333;
-            padding: 10px;
+            padding-top: 1vh;
+            padding-bottom: 1vh;
+            padding-left: 1.8vh;
+            padding-right: 1.8vh;
             text-align: center;
             transition: all 0.2s ease-in-out;
             transform: translateZ(0);
@@ -199,7 +123,7 @@
         }
 
         .register-container {
-            padding-left: 20px;
+            padding-left: 2vw;
         }
 
         #register {
@@ -212,7 +136,10 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             color: #333333;
-            padding: 10px;
+            padding-top: 0.9vh;
+            padding-bottom: 0.9vh;
+            padding-left: 1vh;
+            padding-right: 1vh;
             text-align: center;
             transition: all 0.2s ease-in-out;
             cursor: pointer;
@@ -234,28 +161,71 @@
             display: none;
         }
 
-        @media (max-width: 600px) {
-            .buttons {
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-
-            .search {
-                font-size: 16px;
-                padding: 10px;
-                width: 90%;
-            }
-
-            #header {
-                width: 80%;
-                font-size: 15px;
-            }
-
-            #search_bar:hover::placeholder {
-            font-size: 15px;
+        #loginForm {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(1vw); 
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 1em; 
+            box-shadow: 0 0.4vw 3vw rgba(0, 0, 0, 0.1); 
+            backdrop-filter: blur(0.8vw);
+            -webkit-backdrop-filter: blur(0.8vw); 
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 4vh 4vw; 
+            width: 50vw;
+            max-width: 500px;
+            box-sizing: border-box;
+            z-index: 1004;
+            font-family: "Montserrat", sans-serif;
         }
 
+        #username, #password {
+            font-family: "Montserrat", sans-serif;
+            text-align: center;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+            background-color: #f2f2f200; 
+            border: none; 
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            font-family: "Montserrat", sans-serif;
+            color: #000;
+            border-radius: 10px;
+            margin-bottom: 1vh;
         }
+
+        #forgotPassword {
+            font-size: 0.8em;
+        }
+
+        #loginButton {
+            background: linear-gradient(90deg, rgba(255,177,206,0.7), rgba(178,255,219,0.7), rgba(178,223,255,0.7), rgba(255,178,178,0.7));
+            background-size: 200% 200%;
+            animation: gradient 5s ease infinite;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #333333;
+            padding: 1vh;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+
+        #closeButton {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            cursor: pointer;
+        }
+
+        
     </style>
 </head>
 <body>
@@ -268,8 +238,8 @@
             </div>
             <div class="register-container">
                 <div class="button" id="register" onclick="toggleRegister()">Register</div>
+                <div class="searchButton">Search</div>
             </div>
-            <div class="searchButton">Search</div>
         </div>
     </div>
 
@@ -360,79 +330,32 @@
             searchPlace();
         });
 
-
-        //Adding a place
-        var addingPlace = false;
-        var newPlaceCoordinates = null;
-
-        function toggleAddPlace() {
-            addingPlace = true;
-            document.getElementById('addPlaceForm').style.display = 'block';
-        }
-
-        function closeAddPlace() {
-            addingPlace = false;
-            document.getElementById('addPlaceForm').style.display = 'none';
-        }
-
-        function handleAddPlace() {
-            var placeName = document.getElementById('placeName').value;
-            var place = { name: placeName, lat: newPlaceCoordinates.lat, lon: newPlaceCoordinates.lng };
-            fetch('http://localhost:3000/addPlace', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(place)
-            });
-            closeAddPlace();
-        }
-
-        map.on('click', function(e) {
-            if (addingPlace) {
-                newPlaceCoordinates = e.latlng;
-            }
-        });
-
-        // Display users georeferenced places
-        for (var place in customPlaces) {
-            var lat = customPlaces[place].lat;
-            var lon = customPlaces[place].lon;
-            var circle = L.circle([lat, lon], {
-                color: 'red',
-                fillColor: '#f03',
-                fillOpacity: 0.5,
-                radius: 5000
-            }).addTo(map);
-        }
-
         function searchPlace() {
             var cityName = document.getElementById('search_bar').value;
 
-            // First, try to find a player
+            // First, try to find a user
             fetch('http://localhost:3000/players?username=' + cityName)
                 .then(response => response.json())
                 .then(data => {
                     if (data.length > 0) {
-                        // If a player is found, fly to their coordinates
+                        // If a user is found, fly to their coordinates
+                        var lat = data[0].lat;
+                        var lon = data[0].lon;
+                        map.flyTo([lat, lon], 13);
+                    }});
+            
+            fetch('https://nominatim.openstreetmap.org/search?city=' + cityName + '&format=json')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
                         var lat = data[0].lat;
                         var lon = data[0].lon;
                         map.flyTo([lat, lon], 13);
                     } else {
-                        fetch('https://nominatim.openstreetmap.org/search?city=' + cityName + '&format=json')
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.length > 0) {
-                                    var lat = data[0].lat;
-                                    var lon = data[0].lon;
-                                    map.flyTo([lat, lon], 13);
-                                } else {
-                                    alert('Error, no city found!');
-                                }
-                            });
+                        alert('Error, no city found!');
                     }
                 });
-        }
+            }
 
     </script>
 </body>

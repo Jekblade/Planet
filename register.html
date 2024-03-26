@@ -17,7 +17,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
             background-size: 200% 200%;
             animation: spin 10s linear infinite;
             overflow: hidden;
@@ -33,6 +32,7 @@
             cursor: pointer;
             font-size: 20px;
             transition: transform 0.3s ease-in-out;
+            z-index: 1006;
         }
 
         #backButton:hover {
@@ -147,6 +147,8 @@
             opacity: 0;
             transition: 0.3s;
         }
+
+
 
         .c-form {
             position: relative;
@@ -273,7 +275,6 @@
             height: 100%;
             width: 40px;
             cursor: pointer;
-            pointer-events: none;
             display: flex;
             align-items: center;
             justify-content: flex-end;
@@ -285,6 +286,7 @@
             width: 20px;
             height: 3px;
             background-color: currentColor;
+            cursor: pointer;
         }
 
         .c-form__nextIcon::before,
@@ -295,6 +297,13 @@
             width: 15px;
             height: 3px;
             background-color: inherit;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .c-form__next:hover .c-form__nextIcon::before,
+        .c-form__next:hover .c-form__nextIcon::after {
+            transform: scale(1.2);
         }
 
         .c-form__nextIcon::before {
@@ -314,20 +323,26 @@
             left: 0;
             height: 100%;
             width: 0;
-            background-color: #0069ec;
+            background-color: #3a3a3a30;
             transition: 0.3s;
         }
 
         #passwordStrength {
-            width: 100%;
-            height: 10px;
+            width: 0;
+            height: 3px;
             background-color: #ddd;
+            position: absolute;
+            bottom: 0; 
+            left: 0;
+            transition: width 1s 0.2s ease-out;
         }
 
         #strengthBar {
-            height: 10px;
+            height: 110%;
             width: 0;
             background-color: red;
+            transition: width 0.3s ease;
+            z-index: 1005;
         }
 
     </style>
@@ -342,10 +357,11 @@
 
     <div class="c-formContainer">
         <div class="c-welcome">Welcome aboard!</div>
+
         <form class="c-form" action="">
             <div class="c-form__group">
                 <label class="c-form__label" for="username">
-                    <input type="text" id="username" class="c-form__input" placeholder=" " pattern="[^\s]+" required>
+                    <input type="text" id="username" class="c-form__input" placeholder=" " minlength="2" pattern="[A-Za-z0-9_.-]+" required>
                     <label class="c-form__next" for="progress2" role="button">
                         <span class="c-form__nextIcon"></span>
                     </label>
@@ -367,12 +383,12 @@
 
             <div class="c-form__group">
                 <label class="c-form__label" for="fpass">
-                    <input type="password" id="fpass" class="c-form__input" placeholder=" " required>
+                    <input type="password" id="fpass" class="c-form__input" minlength="8" pattern=".{8,}" placeholder=" " required>
                     <label class="c-form__next" for="finish" role="button">
                         <span class="c-form__nextIcon"></span>
                     </label>
                     <span class="c-form__groupLabel">Create your password.</span>
-                    <div id="passwordStrength">
+                    <div id="passwordStrength" class="c-form__border">
                         <div id="strengthBar"></div>
                     </div>
                     <b class="c-form__border"></b>
@@ -385,92 +401,195 @@
 
 
     <script>
-    var backgrounds = [
-        "linear-gradient(45deg, #ffbc00, #ff6600)", // Sunrise (Warm orange tones)
-        "linear-gradient(45deg, #00b4d8, #0099e5)", // Midday (Cool blue tones)
-        "linear-gradient(45deg, #ff5757, #ff9999)", // Afternoon (Vibrant red tones)
-        "linear-gradient(45deg, #ff416c, #ff4b2b)", // Sunset (Bold pink and orange tones)
-        "linear-gradient(45deg, #232526, #414345)"  // Midnight (Dark and mysterious)
-    ];
+        var backgrounds = [
+            "linear-gradient(45deg, #ffbc00, #ff6600)", // Sunrise (Warm orange tones)
+            "linear-gradient(45deg, #00b4d8, #0099e5)", // Midday (Cool blue tones)
+            "linear-gradient(45deg, #ff5757, #ff9999)", // Afternoon (Vibrant red tones)
+            "linear-gradient(45deg, #ff416c, #ff4b2b)", // Sunset (Bold pink and orange tones)
+            "linear-gradient(45deg, #232526, #414345)"  // Midnight (Dark and mysterious)
+        ];
 
-    function updateBackground() {
-        var hour = new Date().getHours();
-        var index;
-        if (hour >= 5 && hour < 8) {
-            index = 0; // Sunrise
-        } else if (hour >= 8 && hour < 12) {
-            index = 1; // Midday
-        } else if (hour >= 12 && hour < 17) {
-            index = 2; // Afternoon
-        } else if (hour >= 17 && hour < 20) {
-            index = 3; // Sunset
-        } else {
-            index = 4; // Midnight
+        function updateBackground() {
+            var hour = new Date().getHours();
+            var index;
+            if (hour >= 5 && hour < 8) {
+                index = 0; // Sunrise
+            } else if (hour >= 8 && hour < 12) {
+                index = 1; // Midday
+            } else if (hour >= 12 && hour < 17) {
+                index = 2; // Afternoon
+            } else if (hour >= 17 && hour < 20) {
+                index = 3; // Sunset
+            } else {
+                index = 4; // Midnight
+            }
+            document.body.style.backgroundImage = backgrounds[index];
         }
-        document.body.style.backgroundImage = backgrounds[index];
-    }
 
-    // Update the background immediately and then every 3 seconds
-    updateBackground();
+        updateBackground();
 
 
-        // Get all the "next" buttons
-        var nextButtons = document.querySelectorAll('.c-form__next');
+        document.addEventListener("DOMContentLoaded", function() {
+            // Function to generate a random integer between min and max (inclusive)
+            function getRandomInt(min, max) {
+                min = Math.ceil(min);
+                max = Math.floor(max);
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
 
-        // Get all the form groups
-        var formGroups = document.querySelectorAll('.c-form__group');
+            // Function to generate a random color
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
 
-        // Add event listener for 'click' event to each "next" button
-        for (let i = 0; i < nextButtons.length; i++) {
-            nextButtons[i].addEventListener('click', function(e) {
-                // Prevent the default action
-                e.preventDefault();
+            // Get all the "next" buttons
+            var nextButtons = document.querySelectorAll('.c-form__next');
 
+            // Get all the form groups
+            var formGroups = document.querySelectorAll('.c-form__group');
+
+            // Function to handle form progression
+            function handleProgress(i) {
                 // Get the associated input field
-                var input = e.target.previousElementSibling;
+                var input = formGroups[i].querySelector('.c-form__input');
 
-                // If input is valid, hide the current view and show the next one
                 if (input.checkValidity()) {
-                    formGroups[i].style.display = 'none'; // Hide the current view
+                    formGroups[i].style.visibility = 'hidden'; 
+                    formGroups[i].style.opacity = 0;
                     if (formGroups[i + 1]) {
-                        formGroups[i + 1].style.display = 'block'; // Show the next view
+                        formGroups[i + 1].style.visibility = 'visible';
+                        formGroups[i + 1].style.opacity = 1;
+                    }
+
+                    // If this is the last form group
+                    if (i === formGroups.length - 1) {
+                        var username = document.getElementById('username').value;
+
+                        // Hide the form
+                        document.querySelector('.c-form').style.display = 'none';
+
+                        // Show the welcome message and avatar ID
+                        var welcomeMessage = document.querySelector('.c-welcome');
+                        welcomeMessage.textContent = 'Welcome aboard, ' + username + '!';
+                        welcomeMessage.style.display = 'block';
+
+                        // Generate a random avatar ID
+                        var avatarId = getRandomInt(1, 1000);
+                        var avatarColor = getRandomColor();
+
+                        // Create a div for the avatar ID
+                        var avatarDiv = document.createElement('div');
+                        avatarDiv.innerHTML = 'Your Avatar ID: <span style="color: ' + avatarColor + '; font-size: 2em;">' + avatarId + '</span>';
+
+                        // Append the avatar div below the "Welcome" message
+                        document.querySelector('.c-formContainer').appendChild(avatarDiv);
+
+                        // Add event listener for 'click' event to the document
+                        document.addEventListener('click', function() {
+                            window.location.href = 'index.html';
+                        });
                     }
                 }
-            });
-        }
-            
-        // Password strength
-        document.getElementById('fpass').addEventListener('input', function(e) {
-            var strength = e.target.value.length;
-            var bar = document.getElementById('strengthBar');
+            }
 
-            if (strength < 5) {
-                bar.style.width = '33%';
-                bar.style.backgroundColor = 'red';
-            } else if (strength < 10) {
-                bar.style.width = '66%';
-                bar.style.backgroundColor = 'orange';
-            } else {
-                bar.style.width = '100%';
-                bar.style.backgroundColor = 'green';
+            // Add event listener for 'click' event to each "next" button
+            for (let i = 0; i < nextButtons.length; i++) {
+                nextButtons[i].addEventListener('click', function(e) {
+                    e.preventDefault();
+                    handleProgress(i);
+                });
+
+                // Add 'keydown' event listener to the input field
+                var input = formGroups[i].querySelector('.c-form__input');
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        // Prevent the default action
+                        e.preventDefault();
+                        handleProgress(i);
+                    }
+                });
             }
         });
+
+        // Password strength meter
+        document.getElementById('fpass').addEventListener('input', function(e) {
+            var password = e.target.value;
+            var bar = document.getElementById('strengthBar');
+            var passwordStrength = document.getElementById('passwordStrength');
+
+            var strength = 0;
+
+            if (password.length >= 12) strength++; // length is at least 12
+            if (/[A-Z]/.test(password)) strength++; // contains uppercase letter
+            if (/[a-z]/.test(password)) strength++; // contains lowercase letter
+            if (/\d/.test(password)) strength++; // contains number
+            if (/\W/.test(password)) strength++; // contains special character
+
+            var width = strength * 20;
+
+            // Update the width of the bar
+            bar.style.width = width + '%';
+            passwordStrength.style.width = '100%';
+
+            // Update the color of the bar
+            if (width < 40) {
+                bar.style.backgroundColor = 'red';
+            } else if (width < 60) {
+                bar.style.backgroundColor = 'orange';
+            } else if (width < 80) {
+                bar.style.backgroundColor = 'lightgreen';
+            } else if (width < 100) {
+                bar.style.backgroundColor = 'green';
+            } else {
+                bar.style.backgroundColor = 'purple';
+            }
+        });
+
+        // AWS RDS
+        AWS.config.region = 'us-east-1'; 
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: 'us-east-1:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', // your Cognito Identity Pool ID
+        });
+
+        // Create a Lambda function object
+        var lambda = new AWS.Lambda();
 
         // Handle form submission
         document.querySelector('.c-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            // Here you can handle the form submission
-            // For example, you can send the form data to a server
-            console.log('Form submitted');
+
+            // Get form data
+            var formData = new FormData(e.target);
+
+            // Prepare the Lambda function invocation parameters
+            var params = {
+                FunctionName: 'yourLambdaFunctionName', // your Lambda function name
+                InvocationType: 'RequestResponse',
+                LogType: 'None',
+                Payload: JSON.stringify({
+                    // your form data
+                    username: formData.get('username'),
+                    password: formData.get('password'),
+                    // add other form fields as needed
+                }),
+            };
+
+            // Invoke the Lambda function
+            lambda.invoke(params, function(err, data) {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log('Lambda function invoked successfully');
+                    console.log('Form submitted');
+                }
+            });
         });
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        // Send registration email
-        // This is a placeholder and won't actually send an email
-        console.log('Sending registration email to ' + document.getElementById('email').value);
-        // Redirect back to the main page
-        window.location.href = 'main.html';
-    });
     </script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
 </body>
 </html>
